@@ -1,0 +1,236 @@
+table DimTrack
+	lineageTag: 55e76cf8-fe3c-4bb9-8b9a-575577bab0bc
+
+	column track_id
+		dataType: string
+		lineageTag: 3400ad66-2d16-4210-823a-924bcec20044
+		summarizeBy: none
+		sourceColumn: track_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column track_name
+		dataType: string
+		lineageTag: 0f254aa6-8ea6-4776-ac9a-5be7b7fc6e55
+		summarizeBy: none
+		sourceColumn: track_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column album_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 006bb634-43d9-40b3-acbe-c12be6a3108d
+		summarizeBy: none
+		sourceColumn: album_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration_ms
+		dataType: int64
+		formatString: 0
+		lineageTag: f37cf072-99de-4fd3-8f60-46c8edf326ff
+		summarizeBy: none
+		sourceColumn: duration_ms
+
+		annotation SummarizationSetBy = User
+
+	/// Raw explicit flag; use explicit_txt in visuals. Kept for the explicit toggle bookmarks.
+	column explicit
+		dataType: boolean
+		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a592ce5e-f5ea-4646-9472-e558e223a3d4
+		summarizeBy: none
+		sourceColumn: explicit
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Pitch class 0-11; sort column for key_txt.
+	column key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d85de534-f40d-4d59-a840-e947d258f1b5
+		summarizeBy: none
+		sourceColumn: key
+
+		annotation SummarizationSetBy = User
+
+	column mode
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b8ad1466-a081-49fc-b5a4-262aab1a7153
+		summarizeBy: none
+		sourceColumn: mode
+
+		annotation SummarizationSetBy = User
+
+	column time_signature
+		dataType: int64
+		formatString: 0
+		lineageTag: 4a4d99b9-4d60-415a-a97d-a808fb6532b1
+		summarizeBy: none
+		sourceColumn: time_signature
+
+		annotation SummarizationSetBy = User
+
+	column key_txt =
+			
+			SWITCH(
+			    DimTrack[key],
+			    0, "C",
+			    1, "C#/Db",
+			    2, "D",
+			    3, "D#/Eb",
+			    4, "E",
+			    5, "F",
+			    6, "F#/Gb",
+			    7, "G",
+			    8, "G#/Ab",
+			    9, "A",
+			    10, "A#/Bb",
+			    11, "B",
+			    "Desconocida"
+			)
+		lineageTag: e3564960-0f7f-47e2-bc40-b09f4b4ab230
+		summarizeBy: none
+		sortByColumn: key
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column mode_txt =
+			
+			SWITCH(
+			    DimTrack[mode],
+			    0, "Minor",
+			    1, "Major"
+			)
+		lineageTag: 77107afc-5b9b-4445-bd81-cf11ac275eaf
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column explicit_txt =
+			
+			IF(
+			    DimTrack[explicit] = TRUE(),
+			    "Explicit",
+			    "Non-Explicit"
+			)
+		lineageTag: 216677a4-bd2b-4594-82ce-200c67c509e7
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Credited artists of the track separated by "; " (the source delimiter, never part of a name). Built with FILTER + RELATED instead of CALCULATE, so there is no context transition and no risk of circular dependencies with other DimTrack columns.
+	column artists_txt =
+			VAR _Id = DimTrack[track_id]
+			RETURN
+			    CONCATENATEX(
+			        FILTER( Bridge_TrackArtist, Bridge_TrackArtist[track_id] = _Id ),
+			        RELATED( DimArtist[artist_name] ),
+			        "; ",
+			        RELATED( DimArtist[artist_name] ), ASC
+			    )
+		lineageTag: 58a0f0fc-e8b9-a029-b036-0ec282b3fa31
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// "Collaboration" when the track credits more than one artist, otherwise "Solo". Derived from artists_txt, so no context transition is needed.
+	column collab_type =
+			IF(
+			    CONTAINSSTRING( DimTrack[artists_txt], "; " ),
+			    "Collaboration",
+			    "Solo"
+			)
+		lineageTag: 337b819c-8588-4216-a119-c17c7944a60b
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Duration band used by the decomposition tree and key influencers.
+	column duration_bucket =
+			VAR _Ms = DimTrack[duration_ms]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        _Ms < 120000, "< 2 min",
+			        _Ms < 180000, "2–3 min",
+			        _Ms < 240000, "3–4 min",
+			        _Ms < 300000, "4–5 min",
+			        _Ms < 420000, "5–7 min",
+			        "7+ min"
+			    )
+		lineageTag: ab2c72b0-8f1a-b849-8644-ead97b5233b8
+		summarizeBy: none
+		sortByColumn: duration_bucket_order
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sort order for duration_bucket.
+	column duration_bucket_order =
+			VAR _Ms = DimTrack[duration_ms]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        _Ms < 120000, 1,
+			        _Ms < 180000, 2,
+			        _Ms < 240000, 3,
+			        _Ms < 300000, 4,
+			        _Ms < 420000, 5,
+			        6
+			    )
+		isHidden
+		formatString: 0
+		lineageTag: 55e5e366-03b8-5350-ca42-40b9157b20e0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Time signature as text ("4/4"); 0 and 1 are flagged as invalid.
+	column time_signature_txt =
+			SWITCH(
+			    DimTrack[time_signature],
+			    3, "3/4",
+			    4, "4/4",
+			    5, "5/4",
+			    6, "6/4",
+			    7, "7/4",
+			    "Invalid (" & DimTrack[time_signature] & ")"
+			)
+		lineageTag: 6d16dd3f-f384-84ec-53c8-403d4779c9e8
+		summarizeBy: none
+		sortByColumn: time_signature
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimTrack = m
+		mode: import
+		source =
+				let
+				    Source = Spotify_Raw,
+				    #"Columnas seleccionadas" = Table.SelectColumns(Source,
+				        {"track_id","track_name","album_name","duration_ms","explicit","key","mode","time_signature"}),
+				    #"Track único" = Table.Distinct(#"Columnas seleccionadas", {"track_id"}),
+				    #"Combinado con DimAlbum" = Table.NestedJoin(#"Track único", {"album_name"}, DimAlbum, {"album_name"}, "DimAlbum", JoinKind.LeftOuter),
+				    #"album_id expandido" = Table.ExpandTableColumn(#"Combinado con DimAlbum", "DimAlbum", {"album_id"}),
+				    #"album_name quitado" = Table.RemoveColumns(#"album_id expandido", {"album_name"}),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"album_name quitado",
+				        {"track_id","track_name","album_id","duration_ms","explicit","key","mode","time_signature"})
+				in
+				    #"Columnas reordenadas"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,165 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 317.46372579362446,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 938.40086922969454,
+            "y": 107.6252974621097
+          },
+          "nodeIndex": "medidas",
+          "nodeLineageTag": "6581bde3-8e8e-4037-aba8-fb7b16d4ad0a",
+          "size": {
+            "height": 291.29609072002859,
+            "width": 234
+          },
+          "zIndex": 11
+        },
+        {
+          "location": {
+            "x": 553.15939396080944,
+            "y": 676.08818601824464
+          },
+          "nodeIndex": "Bridge_TrackArtist",
+          "nodeLineageTag": "5a35dffe-687c-46d1-8a97-0ab2e83ec9c8",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 4
+        },
+        {
+          "location": {
+            "x": 564.75836725127238,
+            "y": 871.995367805257
+          },
+          "nodeIndex": "Bridge_TrackGenre",
+          "nodeLineageTag": "c56fc365-94b4-4402-8002-ba466de31dd2",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 5
+        },
+        {
+          "location": {
+            "x": 907.797878370615,
+            "y": 489.47584633148017
+          },
+          "nodeIndex": "DimAlbum",
+          "nodeLineageTag": "0667de7b-c2a9-43d7-917e-4a4c37032fd8",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 913.5133134179448,
+            "y": 667.35964541696285
+          },
+          "nodeIndex": "DimArtist",
+          "nodeLineageTag": "47b0db6d-dcdd-435a-bac4-a9f87109a451",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 7
+        },
+        {
+          "location": {
+            "x": 924.0326693250629,
+            "y": 868.98086321484061
+          },
+          "nodeIndex": "DimGenre",
+          "nodeLineageTag": "58ea3a66-5f7e-478e-950d-e7a167e11bda",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 225.46768927015796,
+            "y": 707.715080460162
+          },
+          "nodeIndex": "DimTrack",
+          "nodeLineageTag": "55e76cf8-fe3c-4bb9-8b9a-575577bab0bc",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 10
+        },
+        {
+          "location": {
+            "x": 228.31146277405651,
+            "y": 203.58471997374249
+          },
+          "nodeIndex": "Fact_Track",
+          "nodeLineageTag": "24443243-e980-4b11-82b2-46b3f289068f",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 9
+        },
+        {
+          "location": {
+            "x": 1218.7409143606385,
+            "y": 414.83555112077829
+          },
+          "nodeIndex": "Audio Features",
+          "nodeLineageTag": "0498fcf6-313c-446d-8b1c-4f735192bf8d",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 1302.0750790904804,
+            "y": 179.30032632561054
+          },
+          "nodeIndex": "Feature Bins",
+          "nodeLineageTag": "7cc77b28-47f3-aabc-9e1c-655146f1be24",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 1561.2732250904805,
+            "y": 418.06013432561019
+          },
+          "nodeIndex": "Popularity Segment",
+          "nodeLineageTag": "48b15cdb-3896-bb46-a781-a3e75fdde169",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 3
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 56.447393005377819,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

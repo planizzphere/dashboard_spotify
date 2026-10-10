@@ -1,0 +1,47 @@
+/// Disconnected table with twenty 0.05-wide bins for the audio feature histogram.
+table 'Feature Bins'
+	lineageTag: 7cc77b28-47f3-aabc-9e1c-655146f1be24
+
+	column 'Bin Index'
+		isHidden
+		formatString: 0
+		lineageTag: 8f91b1d9-3029-fd3f-6365-a19fc9546516
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bin Index]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bin Start'
+		isHidden
+		formatString: 0.00
+		lineageTag: 5d62bf81-8dc8-4902-2ad4-b6755af6f20a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bin Start]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bin Label'
+		lineageTag: f65e6899-1e13-ef56-dca8-a9a6337cb5bd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Bin Label]
+		sortByColumn: 'Bin Index'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Feature Bins' = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS(
+				    GENERATESERIES( 0, 19, 1 ),
+				    "Bin Index", [Value],
+				    "Bin Start", [Value] / 20,
+				    "Bin Label", FORMAT( [Value] / 20, "0.00" ) & "–" & FORMAT( ( [Value] + 1 ) / 20, "0.00" )
+				)
+
+	annotation PBI_Id = 447b4a958d9e6000d8d1e57dc3f90304
+

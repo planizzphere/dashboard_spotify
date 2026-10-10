@@ -1,0 +1,44 @@
+/// Disconnected parameter table: one row per 0-1 audio feature. Drives audio_feature_value and every parametrised measure.
+table 'Audio Features'
+	lineageTag: 0498fcf6-313c-446d-8b1c-4f735192bf8d
+
+	column Feature
+		lineageTag: 0c96f6bb-c0fc-4352-a9d9-dba724ef6a31
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Feature]
+		sortByColumn: 'Feature Order'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Feature Order'
+		isHidden
+		formatString: 0
+		lineageTag: e9ed8623-9c4b-e664-0ac4-4f13fe93aa33
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Feature Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Audio Features' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Feature", STRING,
+				    "Feature Order", INTEGER,
+				    {
+				        { "Danceability", 1 },
+				        { "Energy", 2 },
+				        { "Valence", 3 },
+				        { "Acousticness", 4 },
+				        { "Instrumentalness", 5 },
+				        { "Speechiness", 6 }
+				    }
+				)
+
+	annotation PBI_Id = d58d6b3b67824dbdbeab0fe4281d0fda
+

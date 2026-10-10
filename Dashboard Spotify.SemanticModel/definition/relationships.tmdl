@@ -1,0 +1,30 @@
+relationship AutoDetected_43f58eaa-a3ff-4de9-b9bf-a17f1c4119e2
+	crossFilteringBehavior: bothDirections
+	fromColumn: Bridge_TrackGenre.track_id
+	toColumn: DimTrack.track_id
+
+relationship AutoDetected_e59d5ea0-edbd-453c-bb03-0692c16da960
+	crossFilteringBehavior: bothDirections
+	fromColumn: Bridge_TrackArtist.track_id
+	toColumn: DimTrack.track_id
+
+relationship AutoDetected_bb78b8fb-3658-4156-9ecd-762240db0042
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: Fact_Track.track_id
+	toColumn: DimTrack.track_id
+
+relationship AutoDetected_c000de48-b739-4e02-b3e8-9fc215a3937f
+	fromColumn: DimTrack.album_id
+	toColumn: DimAlbum.album_id
+
+relationship AutoDetected_39f09615-c0d0-418e-9238-ad790ee21e13
+	crossFilteringBehavior: bothDirections
+	fromColumn: Bridge_TrackArtist.artist_id
+	toColumn: DimArtist.artist_id
+
+relationship 6da0c1d5-5a63-7010-7d45-8aabf0cb4eba
+	crossFilteringBehavior: bothDirections
+	fromColumn: Bridge_TrackGenre.genre_id
+	toColumn: DimGenre.genre_id
+

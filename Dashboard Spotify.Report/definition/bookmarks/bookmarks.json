@@ -1,0 +1,61 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "0a596149ecb1e8cd74ed",
+      "displayName": "Group 1",
+      "children": [
+        "5a8a7350ee95d1ef79c5",
+        "744dd86b622ed3e780c3"
+      ]
+    },
+    {
+      "name": "66311be79b2077274da3",
+      "displayName": "infopanel1",
+      "children": [
+        "7fb8f0338805b096a47f",
+        "2777f19b728e0268fafe"
+      ]
+    },
+    {
+      "name": "81df93f50c23fc0251ed",
+      "displayName": "Explicit Content 2",
+      "children": [
+        "cc5e6712fd3f6485c4ce",
+        "2e4e5223bfc1a7fcd5ab"
+      ]
+    },
+    {
+      "name": "2a9ed1aefe543c57e6d9",
+      "displayName": "Explicit Content 3",
+      "children": [
+        "e2f2775971c3363a1294",
+        "014ae25f35ee42364539"
+      ]
+    },
+    {
+      "name": "45b02b3ada1650670811",
+      "displayName": "Explicit Content 4",
+      "children": [
+        "a1ee825b87f60a2fd8f4",
+        "d9fb2772690cd973b187"
+      ]
+    },
+    {
+      "name": "0ad5bca84407e605f73a",
+      "displayName": "Explicit Content 5",
+      "children": [
+        "f3522b6e350f2184cf99",
+        "641092886b3f6c79faa0"
+      ]
+    },
+    {
+      "name": "f75739978ef7acf82d89",
+      "displayName": "Drivers Panel",
+      "children": [
+        "4f05f06713ce82c44cba",
+        "0bff12ab3ef1efa114ff"
+      ]
+    }
+  ]
+}

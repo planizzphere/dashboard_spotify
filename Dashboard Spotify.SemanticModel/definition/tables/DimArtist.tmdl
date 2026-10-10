@@ -1,0 +1,43 @@
+table DimArtist
+	lineageTag: 47b0db6d-dcdd-435a-bac4-a9f87109a451
+
+	column artist_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7ffb04fb-320f-42a0-b78c-f8a551edf914
+		summarizeBy: none
+		sourceColumn: artist_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column artist_name
+		dataType: string
+		lineageTag: 12c65fe8-35b3-4ee4-84d1-f42e03e92805
+		summarizeBy: none
+		sourceColumn: artist_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimArtist = m
+		mode: import
+		source =
+				let
+				    Source = Spotify_Raw,
+				    #"Solo artistas" = Table.SelectColumns(Source, {"artists"}),
+				    #"Dividido por delimitador" = Table.ExpandListColumn(
+				        Table.TransformColumns(#"Solo artistas", {{"artists", each Text.Split(_, ";"), type list}}),
+				        "artists"
+				    ),
+				    #"Espacios recortados" = Table.TransformColumns(#"Dividido por delimitador", {{"artists", Text.Trim, type text}}),
+				    #"Artistas únicos" = Table.Distinct(#"Espacios recortados"),
+				    #"Renombrado" = Table.RenameColumns(#"Artistas únicos", {{"artists", "artist_name"}}),
+				    #"Índice agregado" = Table.AddIndexColumn(#"Renombrado", "artist_id", 1, 1, Int64.Type),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"Índice agregado", {"artist_id", "artist_name"})
+				in
+				    #"Columnas reordenadas"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

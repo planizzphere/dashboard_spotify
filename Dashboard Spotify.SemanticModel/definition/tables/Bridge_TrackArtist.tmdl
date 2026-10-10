@@ -1,0 +1,49 @@
+/// Many-to-many bridge (technical table, hidden).
+table Bridge_TrackArtist
+	lineageTag: 5a35dffe-687c-46d1-8a97-0ab2e83ec9c8
+
+	column track_id
+		dataType: string
+		lineageTag: 20d618f7-424a-4da8-bb1e-39db4705589a
+		summarizeBy: none
+		sourceColumn: track_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column artist_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 6b083ab7-91e9-4cca-a9fb-d4f3868a110d
+		summarizeBy: none
+		sourceColumn: artist_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Bridge_TrackArtist = m
+		mode: import
+		source =
+				let
+				    Source = Spotify_Raw,
+				    #"Columnas seleccionadas" = Table.SelectColumns(Source, {"track_id","artists"}),
+				    #"Dividido por delimitador" = Table.ExpandListColumn(
+				        Table.TransformColumns(#"Columnas seleccionadas", {{"artists", each Text.Split(_, ";"), type list}}),
+				        "artists"
+				    ),
+				    #"Espacios recortados" = Table.TransformColumns(#"Dividido por delimitador", {{"artists", Text.Trim, type text}}),
+				    #"Combinaciones únicas" = Table.Distinct(#"Espacios recortados"),
+				    #"Combinado con DimArtist" = Table.NestedJoin(#"Combinaciones únicas", {"artists"}, DimArtist, {"artist_name"}, "DimArtist", JoinKind.LeftOuter),
+				    #"artist_id expandido" = Table.ExpandTableColumn(#"Combinado con DimArtist", "DimArtist", {"artist_id"}),
+				    #"artists quitado" = Table.RemoveColumns(#"artist_id expandido", {"artists"})
+				in
+				    #"artists quitado"
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

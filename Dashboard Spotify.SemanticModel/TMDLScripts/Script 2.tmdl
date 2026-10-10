@@ -1,0 +1,409 @@
+createOrReplace
+	table medidas
+		lineageTag: 6581bde3-8e8e-4037-aba8-fb7b16d4ad0a
+
+		measure average_duration_mmss = ```
+			
+				VAR TotalSegundos = 
+				    DIVIDE(AVERAGE(DimTrack[duration_ms]), 1000)
+				VAR Minutos = 
+				    INT(TotalSegundos / 60)
+				VAR Segundos = 
+				    MOD(TotalSegundos, 60)
+				RETURN
+				    FORMAT(Minutos, "00") & ":" & FORMAT(Segundos, "00")
+				```
+			lineageTag: f46c27f5-0de7-4ad4-a5fb-16e4880d6cca
+			displayFolder: Duración y Tempo
+
+		measure average_tempo =
+			
+				FORMAT(AVERAGE(Fact_Track[tempo]), "0.0") & " BPM"
+			lineageTag: 5459aa95-501d-44be-bc7d-461aec32f9e3
+			displayFolder: Duración y Tempo
+
+		measure txt_1 =
+			
+				"From Spotify Tracks Dataset"
+			lineageTag: 66cf6fef-66b8-494f-a597-9c632a81961a
+			displayFolder: Textos y Etiquetas
+
+		measure average_danceability =
+			
+				AVERAGE(Fact_Track[danceability])
+			lineageTag: f154f9b3-5a12-4a37-ab24-74cb20d57404
+			displayFolder: Audio Features\Promedios
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure average_energy =
+			
+				AVERAGE(Fact_Track[energy])
+			lineageTag: af31b031-63a5-412f-be3f-05b652fbb7c1
+			displayFolder: Audio Features\Promedios
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure average_valence =
+			
+				AVERAGE(Fact_Track[valence])
+			lineageTag: 23a7110d-3406-4b2a-9ab6-3818ab6f07d4
+			displayFolder: Audio Features\Promedios
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure average_acousticness =
+			
+				AVERAGE(Fact_Track[acousticness])
+			lineageTag: 30043166-8207-49a3-8c07-cc110aa71c75
+			displayFolder: Audio Features\Promedios
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure average_instrumentalness =
+			
+				AVERAGE(Fact_Track[instrumentalness])
+			lineageTag: bc026ae9-785a-4e5d-a16b-89a9d7607428
+			displayFolder: Audio Features\Promedios
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure average_speechiness =
+			
+				AVERAGE(Fact_Track[speechiness])
+			lineageTag: 3da3199e-2190-46d7-a644-c63a4f1f1e6f
+			displayFolder: Audio Features\Promedios
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure audio_feature_value =
+			
+				SWITCH(
+				    SELECTEDVALUE('Audio Features'[Feature]),
+				    "Danceability", [average_danceability],
+				    "Energy", [average_energy],
+				    "Valence", [average_valence],
+				    "Acousticness", [average_acousticness],
+				    "Instrumentalness", [average_instrumentalness],
+				    "Speechiness", [average_speechiness]
+				)
+			lineageTag: aa57025f-4fd4-4334-9ff5-3a701eee496c
+			displayFolder: Audio Features\Parametrizadas
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure HTML_about =
+			
+				"
+				<style>
+				  .audio-features {
+				    font-family: Arial, sans-serif;
+				    color: #FFFFFF;
+				    line-height: 1.5;
+				  }
+			
+				  .feature {
+				    margin-bottom: 18px;
+				  }
+			
+				  .feature strong {
+				    display: block;
+				    color: #FFFFFF;
+				    font-size: 15px;
+				    font-weight: 600;
+				    margin-bottom: 4px;
+				  }
+			
+				  .feature span {
+				    display: block;
+				    color: #FFFFFF;
+				    font-size: 12px;
+				    font-weight: 400;
+				    opacity: 0.85;
+				  }
+				</style>
+			
+				<div class=""audio-features"">
+			
+				  <div class=""feature"">
+				    <strong>Energy</strong>
+				    <span>Measures the perceived intensity and activity of a track.</span>
+				  </div>
+			
+				  <div class=""feature"">
+				    <strong>Danceability</strong>
+				    <span>Indicates how suitable a track is for dancing.</span>
+				  </div>
+			
+				  <div class=""feature"">
+				    <strong>Valence</strong>
+				    <span>Represents the musical positiveness of a track, ranging from 0.0 (sad) to 1.0 (happy).</span>
+				  </div>
+			
+				  <div class=""feature"">
+				    <strong>Acousticness</strong>
+				    <span>Indicates the confidence that a track is acoustic.</span>
+				  </div>
+			
+				  <div class=""feature"">
+				    <strong>Instrumentalness</strong>
+				    <span>Predicts whether a track contains vocals; values closer to 1.0 indicate instrumental music.</span>
+				  </div>
+			
+				  <div class=""feature"">
+				    <strong>Speechiness</strong>
+				    <span>Measures the presence of spoken words in a track.</span>
+				  </div>
+			
+				</div>
+				"
+			lineageTag: 9d986cb4-bf2d-4333-b090-773f09093e6c
+			displayFolder: Textos y Etiquetas
+
+		measure 'Total Tracks' =
+			
+				DISTINCTCOUNT( Fact_Track[track_id] )
+			formatString: #,0
+			lineageTag: c7a302b5-adcf-4d1a-947c-7cce411f209e
+			displayFolder: Totales y Conteos
+
+		measure 'Total Artistas' =
+			
+				DISTINCTCOUNT( Bridge_TrackArtist[artist_id] )
+			formatString: #,0
+			lineageTag: a070615e-b05e-4727-a227-f789ffea951b
+			displayFolder: Totales y Conteos
+
+		measure 'Total Álbumes' =
+			
+				DISTINCTCOUNT( DimTrack[album_id] )
+			formatString: #,0
+			lineageTag: 42ba5c27-4a75-46b7-86a9-27ba5409e948
+			displayFolder: Totales y Conteos
+
+		measure 'Total Géneros' =
+			
+				DISTINCTCOUNT( Bridge_TrackGenre[genre_id] )
+			formatString: #,0
+			lineageTag: ed1fdbef-aaa5-4ee0-84a0-b6d4bf49c01a
+			displayFolder: Totales y Conteos
+
+		measure average_popularity =
+			
+				AVERAGE( Fact_Track[popularity] )
+			lineageTag: 22468c12-4abe-4674-8503-72e94349a969
+			displayFolder: Popularidad
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure median_popularity =
+			
+				MEDIAN( Fact_Track[popularity] )
+			lineageTag: e8e85c34-3e91-4d7f-8118-f29543f1009a
+			displayFolder: Popularidad
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure adjusted_popularity = ```
+				-- excluye el ruido de catálogo
+				CALCULATE( [median_popularity], KEEPFILTERS( Fact_Track[popularity] > 0 ) )
+			
+				```
+			lineageTag: fc61a833-d883-47f8-812f-1d923ab603b7
+			displayFolder: Popularidad
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure %_without_popularity =
+			
+				DIVIDE(
+				    CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[popularity] = 0 ) ),
+				    [Total Tracks]
+				)
+			lineageTag: bbc077fe-f457-4933-8960-be809541ae82
+			displayFolder: Popularidad
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure P90_popularity =
+			
+				PERCENTILE.INC( Fact_Track[popularity], 0.90 )
+			lineageTag: b9ed068e-d8a3-401b-87cb-79daba8a3263
+			displayFolder: Popularidad
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure dif_vs_catalog =
+				-- benchmark contra el universo completo
+				[median_popularity] - CALCULATE( [median_popularity], REMOVEFILTERS() )
+			lineageTag: 7da8fb36-70a4-471c-93b9-49d5a374dde0
+			displayFolder: Popularidad
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure genre_ranking =
+			
+				IF(
+				    ISINSCOPE( DimGenre[genre_name] ),
+				    RANKX( ALLSELECTED( DimGenre[genre_name] ), [adjusted_popularity], , DESC, DENSE )
+				)
+			formatString: 0
+			lineageTag: 18bce91b-cb41-420e-8f2f-567783d3b87d
+			displayFolder: Popularidad
+
+		measure feature_intex =
+				-- 1.00 = igual al catálogo completo
+				DIVIDE(
+				    [audio_feature_value],
+				    CALCULATE( [audio_feature_value], REMOVEFILTERS() )
+				)
+			lineageTag: 84c2c482-e9b0-4dc1-a281-12f80f583ed9
+			displayFolder: Audio Features\Parametrizadas
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure feature_dispersion = STDEV.P( Fact_Track[energy] )   -- replicar por feature o parametrizar
+			lineageTag: f9317188-2918-4ddf-a3f3-aefe67d122d1
+			displayFolder: Audio Features\Parametrizadas
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure feature_vs_popularity =
+			
+				VAR Base =
+				    ADDCOLUMNS(
+				        SUMMARIZE( Fact_Track, Fact_Track[track_id] ),
+				        "@X", [audio_feature_value],
+				        "@Y", CALCULATE( AVERAGE( Fact_Track[popularity] ) )
+				    )
+				VAR N  = COUNTROWS( Base )
+				VAR SX = SUMX( Base, [@X] )
+				VAR SY = SUMX( Base, [@Y] )
+				VAR SXY = SUMX( Base, [@X] * [@Y] )
+				VAR SX2 = SUMX( Base, [@X] ^ 2 )
+				VAR SY2 = SUMX( Base, [@Y] ^ 2 )
+				RETURN
+				    DIVIDE( N * SXY - SX * SY, SQRT( (N * SX2 - SX ^ 2) * (N * SY2 - SY ^ 2) ) )
+			lineageTag: 58c757b3-e395-41e7-ba64-fd54b8e74d5a
+			displayFolder: Audio Features\Parametrizadas
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure %_explicit =
+			
+				DIVIDE(
+				    CALCULATE( [Total Tracks], KEEPFILTERS( DimTrack[explicit] = TRUE() ) ),
+				    [Total Tracks]
+				)
+			lineageTag: a0c83026-192e-4a1a-b9e7-965586eb9dcd
+			displayFolder: Composición y Colaboraciones
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure artists_per_track = ```
+			
+				DIVIDE( COUNTROWS( Bridge_TrackArtist ), [Total Tracks] )
+			
+				```
+			lineageTag: 8386d407-8e74-40cc-bc40-e0cd9aba8079
+			displayFolder: Composición y Colaboraciones
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure %_collabs =
+			
+				VAR Colabs =
+				    COUNTROWS(
+				        FILTER(
+				            VALUES( DimTrack[track_id] ),
+				            CALCULATE( COUNTROWS( Bridge_TrackArtist ) ) > 1
+				        )
+				    )
+				RETURN DIVIDE( Colabs, [Total Tracks] )
+			lineageTag: bb1696ed-de7a-4730-b570-2e5bbbe45527
+			displayFolder: Composición y Colaboraciones
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure %_multi_genre_tracks =
+			
+				VAR Multi =
+				    COUNTROWS(
+				        FILTER(
+				            VALUES( DimTrack[track_id] ),
+				            CALCULATE( COUNTROWS( Bridge_TrackGenre ) ) > 1
+				        )
+				    )
+				RETURN DIVIDE( Multi, [Total Tracks] )
+			lineageTag: e0bf491c-ec78-4ae4-8870-4ee962056f17
+			displayFolder: Composición y Colaboraciones
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure no_valid_tempo_tracks =
+			
+				CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[tempo] = 0 ) )
+			formatString: 0
+			lineageTag: 49746222-eaa8-424f-b648-7147c92a1d47
+			displayFolder: Calidad de Datos
+
+		measure tracks_out_of_range = ```
+			
+				CALCULATE( [Total Tracks],
+				    KEEPFILTERS( 
+				        DimTrack[duration_ms] < 30000
+				        || DimTrack[duration_ms] > 600000 )
+				)
+				```
+			formatString: 0
+			lineageTag: 95f770f0-9f61-4313-9e79-8dd02ac01514
+			displayFolder: Calidad de Datos
+
+		measure compass_no_standard =
+			
+				CALCULATE( [Total Tracks], KEEPFILTERS( DimTrack[time_signature] IN {0,1} ) )
+			formatString: 0
+			lineageTag: 814b7393-4914-48b0-b1ca-51ce7fdc4a11
+			displayFolder: Calidad de Datos
+
+		measure '% Registros Limpios' = 1 - DIVIDE( [tracks_out_of_range] + [no_valid_tempo_tracks], [Total Tracks] )
+			lineageTag: 0ca8bfa8-f024-42a5-8af6-e12f9f6043f1
+			displayFolder: Calidad de Datos
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure _TXT_dynamic_title =
+			
+				"Perfil sonoro · " &
+				    IF( ISFILTERED( DimGenre[genre_name] ),
+				        CONCATENATEX( VALUES( DimGenre[genre_name] ), DimGenre[genre_name], ", ", DimGenre[genre_name] ),
+				        "Catálogo completo" )
+			lineageTag: b88f3886-fff7-4453-8722-e2dc2258c9b5
+			displayFolder: Textos y Etiquetas
+
+		measure _TXT_filter_status =
+			
+				VAR n = [Total Tracks]
+				RETURN IF( n < 30, "⚠ Muestra insuficiente (" & n & " tracks) — interpreta con cuidado", BLANK() )
+			lineageTag: e56d7e50-f603-4737-8e7c-a4a99fd8b38d
+			displayFolder: Textos y Etiquetas
+
+		column medidas
+			dataType: string
+			lineageTag: aaed576f-67e6-49ce-af0d-8ac58d336c73
+			summarizeBy: none
+			sourceColumn: medidas
+
+			annotation SummarizationSetBy = Automatic
+
+		partition medidas = m
+			mode: import
+			source =
+					let
+					  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [medidas = _t])
+					in
+					  Source
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table

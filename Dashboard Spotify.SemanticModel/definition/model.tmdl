@@ -1,0 +1,29 @@
+model Model
+	culture: es-MX
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-MX
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["medidas","Spotify_Raw","DimAlbum","DimGenre","DimArtist","DimTrack","Bridge_TrackGenre","Bridge_TrackArtist","Fact_Track"]
+
+annotation PBI_ProTooling = ["TMDLView_Desktop","DevMode"]
+
+ref table medidas
+ref table DimAlbum
+ref table DimGenre
+ref table DimArtist
+ref table DimTrack
+ref table Bridge_TrackGenre
+ref table Bridge_TrackArtist
+ref table Fact_Track
+ref table 'Audio Features'
+ref table 'Feature Bins'
+ref table 'Popularity Segment'
+
+ref cultureInfo es-MX
+

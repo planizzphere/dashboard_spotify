@@ -1,0 +1,36 @@
+table DimAlbum
+	lineageTag: 0667de7b-c2a9-43d7-917e-4a4c37032fd8
+
+	column album_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3e2f1895-bf7d-42fd-aaa2-aa1cf47a4f31
+		summarizeBy: none
+		sourceColumn: album_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column album_name
+		dataType: string
+		lineageTag: f01f1106-3ac2-4de7-b116-e2d984815459
+		summarizeBy: none
+		sourceColumn: album_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimAlbum = m
+		mode: import
+		source =
+				let
+				    Source = Spotify_Raw,
+				    #"Álbumes únicos" = Table.Distinct(Table.SelectColumns(Source, {"album_name"})),
+				    #"Índice agregado" = Table.AddIndexColumn(#"Álbumes únicos", "album_id", 1, 1, Int64.Type),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"Índice agregado", {"album_id", "album_name"})
+				in
+				    #"Columnas reordenadas"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

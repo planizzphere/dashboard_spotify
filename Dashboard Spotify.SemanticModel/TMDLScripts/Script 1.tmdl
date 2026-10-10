@@ -1,0 +1,48 @@
+createOrReplace
+
+	table medidas
+		lineageTag: 6581bde3-8e8e-4037-aba8-fb7b16d4ad0a
+
+		measure average_duration_mmss = ```
+				
+				VAR TotalSegundos = 
+				    DIVIDE(AVERAGE(DimTrack[duration_ms]), 1000)
+				VAR Minutos = 
+				    INT(TotalSegundos / 60)
+				VAR Segundos = 
+				    MOD(TotalSegundos, 60)
+				RETURN
+				    FORMAT(Minutos, "00") & ":" & FORMAT(Segundos, "00")
+				```
+			lineageTag: f46c27f5-0de7-4ad4-a5fb-16e4880d6cca
+
+		measure average_tempo =
+				
+				FORMAT(AVERAGE(Fact_Track[tempo]), "0.0") & " BPM"
+			lineageTag: 5459aa95-501d-44be-bc7d-461aec32f9e3
+
+		measure txt_1 =
+				
+				"From Spotify Tracks Dataset"
+			lineageTag: 66cf6fef-66b8-494f-a597-9c632a81961a
+
+		column medidas
+			dataType: string
+			lineageTag: aaed576f-67e6-49ce-af0d-8ac58d336c73
+			summarizeBy: none
+			sourceColumn: medidas
+
+			annotation SummarizationSetBy = Automatic
+
+		partition medidas = m
+			mode: import
+			source =
+					let
+					  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [medidas = _t])
+					in
+					  Source
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+

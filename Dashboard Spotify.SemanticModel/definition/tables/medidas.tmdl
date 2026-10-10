@@ -1,0 +1,729 @@
+table medidas
+	lineageTag: 6581bde3-8e8e-4037-aba8-fb7b16d4ad0a
+
+	/// Average track duration as mm:ss. Seconds are rounded before splitting, so the result can never show ":60".
+	measure average_duration_mmss =
+			VAR _AvgMs = AVERAGE( DimTrack[duration_ms] )
+			VAR _TotalSeconds = ROUND( DIVIDE( _AvgMs, 1000 ), 0 )
+			VAR _Minutes = INT( _TotalSeconds / 60 )
+			VAR _Seconds = _TotalSeconds - _Minutes * 60
+			RETURN
+			    IF(
+			        NOT( ISBLANK( _AvgMs ) ),
+			        FORMAT( _Minutes, "00" ) & ":" & FORMAT( _Seconds, "00" )
+			    )
+		displayFolder: Duración y Tempo
+		lineageTag: f46c27f5-0de7-4ad4-a5fb-16e4880d6cca
+
+	/// Average tempo formatted as text (e.g. "122.1 BPM").
+	measure average_tempo = FORMAT( AVERAGE( Fact_Track[tempo] ), "0.0" ) & " BPM"
+		displayFolder: Duración y Tempo
+		lineageTag: 5459aa95-501d-44be-bc7d-461aec32f9e3
+
+	/// Static source label.
+	measure txt_1 = "From Spotify Tracks Dataset"
+		displayFolder: Textos y Etiquetas
+		lineageTag: 66cf6fef-66b8-494f-a597-9c632a81961a
+
+	/// Average danceability (0-1 scale) of the tracks in context.
+	measure average_danceability = AVERAGE( Fact_Track[danceability] )
+		formatString: 0.000
+		displayFolder: Audio Features\Promedios
+		lineageTag: f154f9b3-5a12-4a37-ab24-74cb20d57404
+
+	/// Average energy (0-1 scale) of the tracks in context.
+	measure average_energy = AVERAGE( Fact_Track[energy] )
+		formatString: 0.000
+		displayFolder: Audio Features\Promedios
+		lineageTag: af31b031-63a5-412f-be3f-05b652fbb7c1
+
+	/// Average valence (0-1 scale) of the tracks in context.
+	measure average_valence = AVERAGE( Fact_Track[valence] )
+		formatString: 0.000
+		displayFolder: Audio Features\Promedios
+		lineageTag: 23a7110d-3406-4b2a-9ab6-3818ab6f07d4
+
+	/// Average acousticness (0-1 scale) of the tracks in context.
+	measure average_acousticness = AVERAGE( Fact_Track[acousticness] )
+		formatString: 0.000
+		displayFolder: Audio Features\Promedios
+		lineageTag: 30043166-8207-49a3-8c07-cc110aa71c75
+
+	/// Average instrumentalness (0-1 scale) of the tracks in context.
+	measure average_instrumentalness = AVERAGE( Fact_Track[instrumentalness] )
+		formatString: 0.000
+		displayFolder: Audio Features\Promedios
+		lineageTag: bc026ae9-785a-4e5d-a16b-89a9d7607428
+
+	/// Average speechiness (0-1 scale) of the tracks in context.
+	measure average_speechiness = AVERAGE( Fact_Track[speechiness] )
+		formatString: 0.000
+		displayFolder: Audio Features\Promedios
+		lineageTag: 3da3199e-2190-46d7-a644-c63a4f1f1e6f
+
+	/// Average of the selected audio feature (driven by the Audio Features table).
+	measure audio_feature_value =
+			SWITCH(
+			    [_selected_feature],
+			    "Danceability", [average_danceability],
+			    "Energy", [average_energy],
+			    "Valence", [average_valence],
+			    "Acousticness", [average_acousticness],
+			    "Instrumentalness", [average_instrumentalness],
+			    "Speechiness", [average_speechiness]
+			)
+		formatString: 0.000
+		displayFolder: Audio Features\Parametrizadas
+		lineageTag: aa57025f-4fd4-4334-9ff5-3a701eee496c
+
+	/// HTML glossary of the six audio features (HTML Content visual).
+	measure HTML_about =
+			
+			"
+			
+			<style>
+			  .audio-features {
+			    font-family: Arial, sans-serif;
+			    color: #FFFFFF;
+			    line-height: 1.5;
+			
+			    /* Dos columnas */
+			    display: grid;
+			    grid-template-columns: 1fr 1fr;
+			    column-gap: 40px;
+			    row-gap: 18px;
+			
+			    /* Centrado vertical y horizontal */
+			    align-content: center;
+			    justify-content: center;
+			    align-items: center;
+			
+			    text-align: center;
+			
+			    /* Ocupa toda la altura disponible */
+			    height: 100%;
+			    box-sizing: border-box;
+			  }
+			
+			  .feature {
+			    margin-bottom: 0;
+			  }
+			
+			  .feature strong {
+			    display: block;
+			    color: #FFFFFF;
+			    font-size: 15px;
+			    font-weight: 600;
+			    margin-bottom: 4px;
+			  }
+			
+			  .feature span {
+			    display: block;
+			    color: #FFFFFF;
+			    font-size: 12px;
+			    font-weight: 400;
+			    opacity: 0.85;
+			  }
+			</style>
+			
+			<div class=""audio-features"">
+			
+			  <div class=""feature"">
+			    <strong>Energy</strong>
+			    <span>Measures the perceived intensity and activity of a track.</span>
+			  </div>
+			
+			  <div class=""feature"">
+			    <strong>Danceability</strong>
+			    <span>Indicates how suitable a track is for dancing.</span>
+			  </div>
+			
+			  <div class=""feature"">
+			    <strong>Valence</strong>
+			    <span>Represents the musical positiveness of a track, ranging from 0.0 (sad) to 1.0 (happy).</span>
+			  </div>
+			
+			  <div class=""feature"">
+			    <strong>Acousticness</strong>
+			    <span>Indicates the confidence that a track is acoustic.</span>
+			  </div>
+			
+			  <div class=""feature"">
+			    <strong>Instrumentalness</strong>
+			    <span>Predicts whether a track contains vocals; values closer to 1.0 indicate instrumental music.</span>
+			  </div>
+			
+			  <div class=""feature"">
+			    <strong>Speechiness</strong>
+			    <span>Measures the presence of spoken words in a track.</span>
+			  </div>
+			
+			</div>
+			"
+		displayFolder: Textos y Etiquetas
+		lineageTag: 9d986cb4-bf2d-4333-b090-773f09093e6c
+
+	/// Distinct tracks in context (Fact_Track is already de-duplicated by track_id).
+	measure 'Total Tracks' = DISTINCTCOUNT( Fact_Track[track_id] )
+		formatString: #,0
+		displayFolder: Totales y Conteos
+		lineageTag: c7a302b5-adcf-4d1a-947c-7cce411f209e
+
+	/// Distinct artists credited on the tracks in context (through Bridge_TrackArtist).
+	measure 'Total Artistas' = DISTINCTCOUNT( Bridge_TrackArtist[artist_id] )
+		formatString: #,0
+		displayFolder: Totales y Conteos
+		lineageTag: a070615e-b05e-4727-a227-f789ffea951b
+
+	/// Distinct albums of the tracks in context.
+	measure 'Total Álbumes' = DISTINCTCOUNT( DimTrack[album_id] )
+		formatString: #,0
+		displayFolder: Totales y Conteos
+		lineageTag: 42ba5c27-4a75-46b7-86a9-27ba5409e948
+
+	/// Distinct genres of the tracks in context (through Bridge_TrackGenre).
+	measure 'Total Géneros' = DISTINCTCOUNT( Bridge_TrackGenre[genre_id] )
+		formatString: #,0
+		displayFolder: Totales y Conteos
+		lineageTag: ed1fdbef-aaa5-4ee0-84a0-b6d4bf49c01a
+
+	/// Average popularity including zero-popularity tracks. For a single track it is the track popularity.
+	measure average_popularity = AVERAGE( Fact_Track[popularity] )
+		formatString: 0
+		displayFolder: Popularidad
+		lineageTag: 22468c12-4abe-4674-8503-72e94349a969
+
+	/// Median popularity including zero-popularity tracks.
+	measure median_popularity = MEDIAN( Fact_Track[popularity] )
+		formatString: 0
+		displayFolder: Popularidad
+		lineageTag: e8e85c34-3e91-4d7f-8118-f29543f1009a
+
+	/// Median popularity excluding tracks with popularity = 0 (catalog gaps). Main popularity KPI of the report.
+	measure adjusted_popularity = CALCULATE( [median_popularity], KEEPFILTERS( Fact_Track[popularity] > 0 ) )
+		formatString: 0
+		displayFolder: Popularidad
+		lineageTag: fc61a833-d883-47f8-812f-1d923ab603b7
+
+	/// Share of tracks with popularity = 0 (no popularity signal).
+	measure %_without_popularity =
+			DIVIDE(
+			    CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[popularity] = 0 ) ),
+			    [Total Tracks]
+			)
+		formatString: 0.0%
+		displayFolder: Popularidad
+		lineageTag: bbc077fe-f457-4933-8960-be809541ae82
+
+	/// 90th percentile of popularity including zeros.
+	measure P90_popularity = PERCENTILE.INC( Fact_Track[popularity], 0.90 )
+		formatString: 0
+		displayFolder: Popularidad
+		lineageTag: b9ed068e-d8a3-401b-87cb-79daba8a3263
+
+	/// Adjusted median popularity in context minus the adjusted median of the full catalog.
+	measure dif_vs_catalog =
+			-- benchmark against the whole catalog
+			[adjusted_popularity] - CALCULATE( [adjusted_popularity], REMOVEFILTERS() )
+		formatString: +0;-0;0
+		displayFolder: Popularidad
+		lineageTag: 7da8fb36-70a4-471c-93b9-49d5a374dde0
+
+	/// Dense rank of the genre by adjusted median popularity among the genres shown.
+	measure genre_ranking =
+			IF(
+			    ISINSCOPE( DimGenre[genre_name] ),
+			    RANKX( ALLSELECTED( DimGenre[genre_name] ), [adjusted_popularity], , DESC, DENSE )
+			)
+		formatString: 0
+		displayFolder: Popularidad
+		lineageTag: 18bce91b-cb41-420e-8f2f-567783d3b87d
+
+	/// Selected feature in context divided by the full-catalog average (1.00 = catalog). The feature filter is re-applied after REMOVEFILTERS so the denominator matches the row feature.
+	measure feature_index =
+			VAR _Feature = [_selected_feature]
+			VAR _Catalog =
+			    CALCULATE(
+			        [audio_feature_value],
+			        REMOVEFILTERS(),
+			        TREATAS( { _Feature }, 'Audio Features'[Feature] )
+			    )
+			RETURN
+			    DIVIDE( [audio_feature_value], _Catalog )
+		formatString: 0.00
+		displayFolder: Audio Features\Parametrizadas
+		lineageTag: 84c2c482-e9b0-4dc1-a281-12f80f583ed9
+
+	/// Population standard deviation of the selected feature.
+	measure feature_dispersion =
+			SWITCH(
+			    [_selected_feature],
+			        "Danceability", STDEV.P( Fact_Track[danceability] ),
+			        "Energy", STDEV.P( Fact_Track[energy] ),
+			        "Valence", STDEV.P( Fact_Track[valence] ),
+			        "Acousticness", STDEV.P( Fact_Track[acousticness] ),
+			        "Instrumentalness", STDEV.P( Fact_Track[instrumentalness] ),
+			        "Speechiness", STDEV.P( Fact_Track[speechiness] )
+			)
+		formatString: 0.000
+		displayFolder: Audio Features\Parametrizadas
+		lineageTag: f9317188-2918-4ddf-a3f3-aefe67d122d1
+
+	/// Pearson correlation between the selected feature and popularity, computed track by track over tracks with popularity > 0 (two-pass formula for numerical stability). Blank when fewer than 30 tracks.
+	measure feature_vs_popularity =
+			VAR _Feature = [_selected_feature]
+			VAR _Base =
+			    SELECTCOLUMNS(
+			        FILTER( Fact_Track, Fact_Track[popularity] > 0 ),
+			        "@x",
+			            SWITCH(
+			                _Feature,
+			                "Danceability", Fact_Track[danceability],
+			                "Energy", Fact_Track[energy],
+			                "Valence", Fact_Track[valence],
+			                "Acousticness", Fact_Track[acousticness],
+			                "Instrumentalness", Fact_Track[instrumentalness],
+			                "Speechiness", Fact_Track[speechiness]
+			            ),
+			        "@y", Fact_Track[popularity]
+			    )
+			VAR _N = COUNTROWS( _Base )
+			VAR _MeanX = AVERAGEX( _Base, [@x] )
+			VAR _MeanY = AVERAGEX( _Base, [@y] )
+			VAR _Cov = SUMX( _Base, ( [@x] - _MeanX ) * ( [@y] - _MeanY ) )
+			VAR _SSX = SUMX( _Base, ( [@x] - _MeanX ) ^ 2 )
+			VAR _SSY = SUMX( _Base, ( [@y] - _MeanY ) ^ 2 )
+			RETURN
+			    IF( _N >= 30, DIVIDE( _Cov, SQRT( _SSX * _SSY ) ) )
+		formatString: +0.000;-0.000;0.000
+		displayFolder: Audio Features\Parametrizadas
+		lineageTag: 58c757b3-e395-41e7-ba64-fd54b8e74d5a
+
+	/// Share of explicit tracks.
+	measure %_explicit =
+			DIVIDE(
+			    CALCULATE( [Total Tracks], KEEPFILTERS( DimTrack[explicit] = TRUE() ) ),
+			    [Total Tracks]
+			)
+		formatString: 0.0%
+		displayFolder: Composición y Colaboraciones
+		lineageTag: a0c83026-192e-4a1a-b9e7-965586eb9dcd
+
+	/// Average number of credited artists per track. The artist filter is removed for the count so selecting one artist still counts that artist's co-credits.
+	measure artists_per_track =
+			DIVIDE(
+			    CALCULATE(
+			        COUNTROWS( Bridge_TrackArtist ),
+			        REMOVEFILTERS( DimArtist ),
+			        VALUES( DimTrack[track_id] )
+			    ),
+			    [Total Tracks]
+			)
+		formatString: 0.00
+		displayFolder: Composición y Colaboraciones
+		lineageTag: 8386d407-8e74-40cc-bc40-e0cd9aba8079
+
+	/// Share of tracks credited to more than one artist (uses DimTrack[collab_type], so it stays correct when an artist is selected).
+	measure %_collabs =
+			DIVIDE(
+			    CALCULATE( [Total Tracks], KEEPFILTERS( DimTrack[collab_type] = "Collaboration" ) ),
+			    [Total Tracks]
+			)
+		formatString: 0.0%
+		displayFolder: Composición y Colaboraciones
+		lineageTag: bb1696ed-de7a-4730-b570-2e5bbbe45527
+
+	/// Share of tracks listed under more than one genre. The genre filter is removed inside the per-track count so selecting a genre does not force the result to 0%.
+	measure %_multi_genre_tracks =
+			VAR _Multi =
+			    COUNTROWS(
+			        FILTER(
+			            VALUES( DimTrack[track_id] ),
+			            CALCULATE( COUNTROWS( Bridge_TrackGenre ), REMOVEFILTERS( DimGenre ) ) > 1
+			        )
+			    )
+			RETURN
+			    DIVIDE( _Multi, [Total Tracks] )
+		formatString: 0.0%
+		displayFolder: Composición y Colaboraciones
+		lineageTag: e0bf491c-ec78-4ae4-8870-4ee962056f17
+
+	/// Tracks with tempo = 0 (failed tempo detection).
+	measure no_valid_tempo_tracks = CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[tempo] = 0 ) ) + 0
+		formatString: #,0
+		displayFolder: Calidad de Datos
+		lineageTag: 49746222-eaa8-424f-b648-7147c92a1d47
+
+	/// Tracks shorter than 30 seconds or longer than 10 minutes.
+	measure tracks_out_of_range =
+			CALCULATE(
+			    [Total Tracks],
+			    KEEPFILTERS(
+			        DimTrack[duration_ms] < 30000
+			            || DimTrack[duration_ms] > 600000
+			    )
+			) + 0
+		formatString: #,0
+		displayFolder: Calidad de Datos
+		lineageTag: 95f770f0-9f61-4313-9e79-8dd02ac01514
+
+	/// Tracks with an invalid time signature (0 or 1).
+	measure compass_no_standard = CALCULATE( [Total Tracks], KEEPFILTERS( DimTrack[time_signature] IN { 0, 1 } ) ) + 0
+		formatString: #,0
+		displayFolder: Calidad de Datos
+		lineageTag: 814b7393-4914-48b0-b1ca-51ce7fdc4a11
+
+	/// Share of tracks without any data-quality flag.
+	measure '% Registros Limpios' =
+			IF(
+			    NOT( ISBLANK( [Total Tracks] ) ),
+			    1 - DIVIDE( [tracks_with_issues], [Total Tracks] )
+			)
+		formatString: 0.0%
+		displayFolder: Calidad de Datos
+		lineageTag: 0ca8bfa8-f024-42a5-8af6-e12f9f6043f1
+
+	/// Dynamic subtitle describing the current genre scope.
+	measure _TXT_dynamic_title =
+			VAR _Genres = VALUES( DimGenre[genre_name] )
+			VAR _Count = COUNTROWS( _Genres )
+			VAR _Scope =
+			    SWITCH(
+			        TRUE(),
+			        NOT( ISFILTERED( DimGenre[genre_name] ) ), "Full catalog",
+			        _Count <= 3, CONCATENATEX( _Genres, DimGenre[genre_name], ", ", DimGenre[genre_name], ASC ),
+			        _Count & " genres selected"
+			    )
+			RETURN
+			    "Sound profile · " & _Scope
+		displayFolder: Textos y Etiquetas
+		lineageTag: b88f3886-fff7-4453-8722-e2dc2258c9b5
+
+	/// Warning shown when the current selection has fewer than 30 tracks.
+	measure _TXT_filter_status =
+			VAR _N = [Total Tracks]
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        ISBLANK( _N ), "⚠ No tracks match the current filters",
+			        _N < 30, "⚠ Small sample (" & _N & " tracks) · interpret with caution",
+			        BLANK()
+			    )
+		displayFolder: Textos y Etiquetas
+		lineageTag: e56d7e50-f603-4737-8e7c-a4a99fd8b38d
+
+	/// Feature chosen in the Audio Features slicer (or the current axis item). Falls back to Energy so visuals never go blank after "Clear all slicers".
+	measure _selected_feature = SELECTEDVALUE( 'Audio Features'[Feature], "Energy" )
+		displayFolder: Audio Features\Parametrizadas
+		lineageTag: 7a870a3f-b990-019e-bb6d-fe7d8dc94aab
+
+	/// Share of popularity variance explained by the selected feature alone (r squared).
+	measure feature_r_squared =
+			VAR _r = [feature_vs_popularity]
+			RETURN
+			    IF( NOT( ISBLANK( _r ) ), _r * _r )
+		formatString: 0.0%
+		displayFolder: Audio Features\Parametrizadas
+		lineageTag: 165a38cc-4876-f90a-1080-bc02da6b1517
+
+	/// Tracks whose selected feature falls in the current 0.05-wide bin (last bin includes 1.0). Returns 0 for empty bins so the histogram keeps every bin.
+	measure tracks_in_feature_bin =
+			VAR _Idx = SELECTEDVALUE( 'Feature Bins'[Bin Index] )
+			VAR _Lo = _Idx / 20
+			VAR _Hi = IF( _Idx = 19, 2, ( _Idx + 1 ) / 20 )
+			VAR _Result =
+			    SWITCH(
+			        [_selected_feature],
+			        "Danceability", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[danceability] >= _Lo && Fact_Track[danceability] < _Hi ) ),
+			        "Energy", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[energy] >= _Lo && Fact_Track[energy] < _Hi ) ),
+			        "Valence", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[valence] >= _Lo && Fact_Track[valence] < _Hi ) ),
+			        "Acousticness", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[acousticness] >= _Lo && Fact_Track[acousticness] < _Hi ) ),
+			        "Instrumentalness", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[instrumentalness] >= _Lo && Fact_Track[instrumentalness] < _Hi ) ),
+			        "Speechiness", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[speechiness] >= _Lo && Fact_Track[speechiness] < _Hi ) )
+			    )
+			RETURN
+			    IF( NOT( ISBLANK( _Idx ) ), _Result + 0 )
+		formatString: #,0
+		displayFolder: Audio Features\Distribución
+		lineageTag: 05c57be3-2b61-54cb-2517-67a73d0fe1bd
+
+	/// Share of the tracks in context that fall in the current feature bin.
+	measure share_in_feature_bin = DIVIDE( [tracks_in_feature_bin], [Total Tracks] )
+		formatString: 0.0%
+		displayFolder: Audio Features\Distribución
+		lineageTag: 773830bb-9b33-a1cb-f80d-14318070b3f6
+
+	/// Median popularity (excluding zeros) of the tracks in the current feature bin. Hidden for bins with fewer than 30 tracks.
+	measure adjusted_popularity_in_feature_bin =
+			VAR _Idx = SELECTEDVALUE( 'Feature Bins'[Bin Index] )
+			VAR _Lo = _Idx / 20
+			VAR _Hi = IF( _Idx = 19, 2, ( _Idx + 1 ) / 20 )
+			VAR _Tracks = [tracks_in_feature_bin]
+			VAR _Value =
+			    SWITCH(
+			        [_selected_feature],
+			        "Danceability", CALCULATE( [adjusted_popularity], KEEPFILTERS( Fact_Track[danceability] >= _Lo && Fact_Track[danceability] < _Hi ) ),
+			        "Energy", CALCULATE( [adjusted_popularity], KEEPFILTERS( Fact_Track[energy] >= _Lo && Fact_Track[energy] < _Hi ) ),
+			        "Valence", CALCULATE( [adjusted_popularity], KEEPFILTERS( Fact_Track[valence] >= _Lo && Fact_Track[valence] < _Hi ) ),
+			        "Acousticness", CALCULATE( [adjusted_popularity], KEEPFILTERS( Fact_Track[acousticness] >= _Lo && Fact_Track[acousticness] < _Hi ) ),
+			        "Instrumentalness", CALCULATE( [adjusted_popularity], KEEPFILTERS( Fact_Track[instrumentalness] >= _Lo && Fact_Track[instrumentalness] < _Hi ) ),
+			        "Speechiness", CALCULATE( [adjusted_popularity], KEEPFILTERS( Fact_Track[speechiness] >= _Lo && Fact_Track[speechiness] < _Hi ) )
+			    )
+			RETURN
+			    IF( NOT( ISBLANK( _Idx ) ) && _Tracks >= 30, _Value )
+		formatString: 0
+		displayFolder: Audio Features\Distribución
+		lineageTag: e45cff01-2a87-34a4-7810-3943be3c7353
+
+	/// Tracks in the current DimTrack category as a share of all tracks selected in the visual.
+	measure share_of_tracks =
+			DIVIDE(
+			    [Total Tracks],
+			    CALCULATE( [Total Tracks], ALLSELECTED( DimTrack ) )
+			)
+		formatString: 0.0%
+		displayFolder: Totales y Conteos
+		lineageTag: 99726ded-828a-84e0-fc0a-bcaf182c4cf8
+
+	/// 90th percentile of popularity among tracks with popularity > 0. Threshold of the "Top 10%" segment.
+	measure P90_popularity_adjusted =
+			CALCULATE(
+			    PERCENTILE.INC( Fact_Track[popularity], 0.90 ),
+			    KEEPFILTERS( Fact_Track[popularity] > 0 )
+			)
+		formatString: 0
+		displayFolder: Popularidad
+		lineageTag: d8f02669-04fe-641f-365c-d3fbcf0a8798
+
+	/// Tracks in the popularity segment: Top 10% (popularity >= P90 of non-zero tracks in context), Rest, or No signal (popularity = 0).
+	measure segment_tracks =
+			VAR _Segment = SELECTEDVALUE( 'Popularity Segment'[Segment] )
+			VAR _P90 = [P90_popularity_adjusted]
+			RETURN
+			    SWITCH(
+			        _Segment,
+			        "Top 10%", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[popularity] >= _P90 ) ),
+			        "Rest", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[popularity] > 0 && Fact_Track[popularity] < _P90 ) ),
+			        "No signal", CALCULATE( [Total Tracks], KEEPFILTERS( Fact_Track[popularity] = 0 ) )
+			    )
+		formatString: #,0
+		displayFolder: Popularidad\Segmentos
+		lineageTag: c2867b24-1bc0-48c6-d22d-9233f0cb7bf0
+
+	/// Average of the selected feature for the tracks in the popularity segment.
+	measure segment_feature_value =
+			VAR _Segment = SELECTEDVALUE( 'Popularity Segment'[Segment] )
+			VAR _P90 = [P90_popularity_adjusted]
+			RETURN
+			    SWITCH(
+			        _Segment,
+			        "Top 10%", CALCULATE( [audio_feature_value], KEEPFILTERS( Fact_Track[popularity] >= _P90 ) ),
+			        "Rest", CALCULATE( [audio_feature_value], KEEPFILTERS( Fact_Track[popularity] > 0 && Fact_Track[popularity] < _P90 ) ),
+			        "No signal", CALCULATE( [audio_feature_value], KEEPFILTERS( Fact_Track[popularity] = 0 ) )
+			    )
+		formatString: 0.000
+		displayFolder: Popularidad\Segmentos
+		lineageTag: f290776b-3cea-7252-bb38-49b1e10c081a
+
+	/// Segment feature average divided by the average of all tracks in the current selection (1.00 = same profile).
+	measure segment_feature_index = DIVIDE( [segment_feature_value], [audio_feature_value] )
+		formatString: 0.00
+		displayFolder: Popularidad\Segmentos
+		lineageTag: 143dc05b-d315-e707-6c53-1a2d2b59f1e0
+
+	/// Distinct tracks with at least one data-quality flag (invalid tempo, duration outlier or invalid time signature). A track with several flags is counted once.
+	measure tracks_with_issues =
+			VAR _DimIssues =
+			    CALCULATETABLE(
+			        VALUES( DimTrack[track_id] ),
+			        KEEPFILTERS(
+			            FILTER(
+			                ALL( DimTrack[duration_ms], DimTrack[time_signature] ),
+			                DimTrack[duration_ms] < 30000
+			                    || DimTrack[duration_ms] > 600000
+			                    || DimTrack[time_signature] IN { 0, 1 }
+			            )
+			        )
+			    )
+			VAR _FactIssues =
+			    CALCULATETABLE(
+			        VALUES( Fact_Track[track_id] ),
+			        KEEPFILTERS( Fact_Track[tempo] = 0 )
+			    )
+			RETURN
+			    COUNTROWS( DISTINCT( UNION( _DimIssues, _FactIssues ) ) ) + 0
+		formatString: #,0
+		displayFolder: Calidad de Datos
+		lineageTag: 562e6401-ec35-1b61-8061-6e23f2a81620
+
+	/// Average of the selected feature across all tracks that share a genre with the track(s) in context. Benchmark for Track 360.
+	measure feature_value_genre_benchmark =
+			VAR _Feature = [_selected_feature]
+			VAR _GenreIds =
+			    CALCULATETABLE( VALUES( Bridge_TrackGenre[genre_id] ), REMOVEFILTERS( DimGenre ) )
+			RETURN
+			    CALCULATE(
+			        [audio_feature_value],
+			        REMOVEFILTERS(),
+			        TREATAS( _GenreIds, DimGenre[genre_id] ),
+			        TREATAS( { _Feature }, 'Audio Features'[Feature] )
+			    )
+		formatString: 0.000
+		displayFolder: Track 360
+		lineageTag: 7b98925a-3b28-1ef7-81fb-5e27e206d14c
+
+	/// Track feature value minus its genre benchmark.
+	measure track_vs_genre_delta = [audio_feature_value] - [feature_value_genre_benchmark]
+		formatString: +0.000;-0.000;0.000
+		displayFolder: Track 360
+		lineageTag: 0c246b9f-e991-8bfd-ffc8-53395db7f4d7
+
+	/// Share of tracks in the same genre(s) with lower popularity than the selected track.
+	measure track_genre_percentile =
+			VAR _Pop = [average_popularity]
+			VAR _GenreIds =
+			    CALCULATETABLE( VALUES( Bridge_TrackGenre[genre_id] ), REMOVEFILTERS( DimGenre ) )
+			VAR _Peers =
+			    CALCULATE( [Total Tracks], REMOVEFILTERS(), TREATAS( _GenreIds, DimGenre[genre_id] ) )
+			VAR _Below =
+			    CALCULATE(
+			        [Total Tracks],
+			        REMOVEFILTERS(),
+			        TREATAS( _GenreIds, DimGenre[genre_id] ),
+			        Fact_Track[popularity] < _Pop
+			    )
+			RETURN
+			    IF( HASONEVALUE( DimTrack[track_id] ), DIVIDE( _Below, _Peers ) + 0 )
+		formatString: 0%
+		displayFolder: Track 360
+		lineageTag: 26f9b86e-7610-d75f-cfcb-22887d085354
+
+	/// Name of the track in context.
+	measure _TXT_track_name = SELECTEDVALUE( DimTrack[track_name], "Multiple tracks" )
+		displayFolder: Track 360
+		lineageTag: 9d4c4609-f14e-ccad-3a25-bd596d44e8a6
+
+	/// All credited artists of the track in context, comma separated (reads DimTrack[artists_txt], so the artist slicer does not hide co-credits).
+	measure _TXT_track_artists =
+			IF(
+			    HASONEVALUE( DimTrack[track_id] ),
+			    SUBSTITUTE( SELECTEDVALUE( DimTrack[artists_txt] ), "; ", ", " )
+			)
+		displayFolder: Track 360
+		lineageTag: 10fe045b-d8d4-8e52-a326-52c45b8b9c57
+
+	/// Album of the track in context (DimAlbum filters DimTrack one-way, so the album is looked up by key).
+	measure _TXT_track_album =
+			IF(
+			    HASONEVALUE( DimTrack[track_id] ),
+			    LOOKUPVALUE( DimAlbum[album_name], DimAlbum[album_id], SELECTEDVALUE( DimTrack[album_id] ) )
+			)
+		displayFolder: Track 360
+		lineageTag: 3f076d47-6a8b-c7d4-deb9-c30a7084b754
+
+	/// All genres of the track in context (ignores the genre slicer).
+	measure _TXT_track_genres =
+			IF(
+			    HASONEVALUE( DimTrack[track_id] ),
+			    CALCULATE(
+			        CONCATENATEX( VALUES( DimGenre[genre_name] ), DimGenre[genre_name], ", ", DimGenre[genre_name], ASC ),
+			        REMOVEFILTERS( DimGenre )
+			    )
+			)
+		displayFolder: Track 360
+		lineageTag: 7157cadf-d93d-0a29-7544-dfa4c7afc416
+
+	/// Artists and album line for Track 360.
+	measure _TXT_track_subtitle = [_TXT_track_artists] & "  ·  " & [_TXT_track_album]
+		displayFolder: Track 360
+		lineageTag: 019a38d2-19a3-319e-6076-65e9d19053e4
+
+	/// Key and mode of the track in context (e.g. "G Major").
+	measure _TXT_key_mode =
+			IF(
+			    HASONEVALUE( DimTrack[track_id] ),
+			    SELECTEDVALUE( DimTrack[key_txt] ) & " " & SELECTEDVALUE( DimTrack[mode_txt] )
+			)
+		displayFolder: Track 360
+		lineageTag: fa0b2475-e54d-3423-6693-853ebf5a89d4
+
+	/// Explicit flag of the track in context.
+	measure _TXT_explicit = SELECTEDVALUE( DimTrack[explicit_txt], "Mixed" )
+		displayFolder: Track 360
+		lineageTag: 071f9769-9d18-4965-7af3-25dbff1a8545
+
+	/// Dynamic subtitle for the popularity histogram.
+	measure _TXT_zero_popularity_note = FORMAT( [%_without_popularity], "0.0%" ) & " of tracks score 0 · missing signal, not low demand"
+		displayFolder: Textos y Etiquetas
+		lineageTag: b7c2344b-11fa-d4d8-0a50-961d557db6a2
+
+	/// Subtitle for the median popularity card.
+	measure _TXT_adjusted_note = "Excl. zero-popularity tracks: " & FORMAT( [adjusted_popularity], "0" )
+		displayFolder: Textos y Etiquetas
+		lineageTag: f601ab2a-7b9e-bb8b-e6b2-a3d8fb5e6601
+
+	/// Rank of the single selected genre by adjusted median popularity among all genres.
+	measure _TXT_genre_rank =
+			VAR _Genre = SELECTEDVALUE( DimGenre[genre_name] )
+			VAR _Total = COUNTROWS( ALL( DimGenre[genre_name] ) )
+			VAR _Rank =
+			    IF(
+			        NOT( ISBLANK( _Genre ) ),
+			        RANKX( ALL( DimGenre[genre_name] ), [adjusted_popularity], , DESC, DENSE )
+			    )
+			RETURN
+			    IF( ISBLANK( _Rank ), "Pick one genre", "#" & _Rank & " of " & _Total )
+		displayFolder: Textos y Etiquetas
+		lineageTag: 1f4a64d7-121b-7460-0954-f3b9a945b25e
+
+	/// Card title: average of the selected feature.
+	measure _TXT_feature_avg_title = "Avg. " & [_selected_feature]
+		displayFolder: Textos y Etiquetas
+		lineageTag: f90a6fcf-f09e-f14b-66e8-ca5bd22c8399
+
+	/// Card title: dispersion of the selected feature.
+	measure _TXT_feature_sd_title = [_selected_feature] & " Std. Dev."
+		displayFolder: Textos y Etiquetas
+		lineageTag: 6b87d0bf-5909-9f93-8e91-b01206025c49
+
+	/// Title of the genre ranking bars.
+	measure _TXT_genre_bar_title = [_selected_feature] & " by Genre"
+		displayFolder: Textos y Etiquetas
+		lineageTag: 7ffb16d7-0de7-4238-332c-b450995a980b
+
+	/// Title of the feature histogram.
+	measure _TXT_hist_title = [_selected_feature] & " Distribution"
+		displayFolder: Textos y Etiquetas
+		lineageTag: 510a4ce1-5d78-0202-3670-409b90929d7a
+
+	/// Title of the popularity-by-bin line chart.
+	measure _TXT_bin_line_title = "Median Popularity across the " & [_selected_feature] & " Range"
+		displayFolder: Textos y Etiquetas
+		lineageTag: b31f91cc-16a5-0f95-050f-cfcad45cdb87
+
+	/// Genre name for the genre tooltip page.
+	measure _TXT_tooltip_genre = SELECTEDVALUE( DimGenre[genre_name], "Multiple genres" )
+		displayFolder: Textos y Etiquetas
+		lineageTag: a7aaf70b-dff0-1682-d388-1bc3d7b5343b
+
+	column medidas
+		dataType: string
+		isHidden
+		lineageTag: aaed576f-67e6-49ce-af0d-8ac58d336c73
+		summarizeBy: none
+		sourceColumn: medidas
+
+		annotation SummarizationSetBy = Automatic
+
+	partition medidas = m
+		mode: import
+		source =
+				let
+				  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [medidas = _t])
+				in
+				  Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

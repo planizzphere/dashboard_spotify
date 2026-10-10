@@ -1,0 +1,39 @@
+/// Disconnected table with the three popularity segments used by the segment_* measures.
+table 'Popularity Segment'
+	lineageTag: 48b15cdb-3896-bb46-a781-a3e75fdde169
+
+	column Segment
+		lineageTag: 19a18b30-99fa-8102-9513-073a45b9e864
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Segment]
+		sortByColumn: 'Segment Order'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Segment Order'
+		formatString: 0
+		lineageTag: 826a5fca-2f57-f3e3-54ac-2eeffc00c4e8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Segment Order]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Popularity Segment' = calculated
+		mode: import
+		source =
+				DATATABLE(
+				    "Segment", STRING,
+				    "Segment Order", INTEGER,
+				    {
+				        { "Top 10%", 1 },
+				        { "Rest", 2 },
+				        { "No signal", 3 }
+				    }
+				)
+
+	annotation PBI_Id = 610f853747b3de840734a09c293b1ab1
+

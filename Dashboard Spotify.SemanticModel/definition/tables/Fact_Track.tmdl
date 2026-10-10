@@ -1,0 +1,166 @@
+table Fact_Track
+	lineageTag: 24443243-e980-4b11-82b2-46b3f289068f
+
+	column track_id
+		dataType: string
+		isHidden
+		lineageTag: 8ec09b01-c6a9-4b6f-b101-b75c9d56e449
+		summarizeBy: none
+		sourceColumn: track_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column popularity
+		dataType: int64
+		formatString: 0
+		lineageTag: 704d115e-3657-478c-b5df-5283614b138d
+		summarizeBy: none
+		sourceColumn: popularity
+
+		annotation SummarizationSetBy = User
+
+		annotation __PBI_SemanticLinks = [{"LinkTarget":{"TableName":"Fact_Track","TableItemName":"popularity (bins)","ObjectType":4},"LinkType":"UsedInGroup"}]
+
+	column danceability
+		dataType: double
+		lineageTag: 1477254f-98f4-41d0-a53e-005a103e7c81
+		summarizeBy: none
+		sourceColumn: danceability
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column energy
+		dataType: double
+		lineageTag: ffa0bc2d-b5db-4ff3-bcb2-805bb9059853
+		summarizeBy: none
+		sourceColumn: energy
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column loudness
+		dataType: double
+		lineageTag: 04cf0064-c4ba-425b-83ae-808cf20efb32
+		summarizeBy: none
+		sourceColumn: loudness
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column speechiness
+		dataType: double
+		lineageTag: 1772b8dd-a37c-43c6-90c4-c0deec491e0b
+		summarizeBy: none
+		sourceColumn: speechiness
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column acousticness
+		dataType: double
+		lineageTag: 991a9c14-4ead-4510-ad4e-bfd4bc019570
+		summarizeBy: none
+		sourceColumn: acousticness
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column instrumentalness
+		dataType: double
+		lineageTag: 3beb46eb-265f-417f-949c-0946c1d43952
+		summarizeBy: none
+		sourceColumn: instrumentalness
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column liveness
+		dataType: double
+		lineageTag: 02fdb537-98b1-4e66-a512-84383d4b4bcb
+		summarizeBy: none
+		sourceColumn: liveness
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column valence
+		dataType: double
+		lineageTag: 70121186-8215-4459-8dc6-8a9235e799d5
+		summarizeBy: none
+		sourceColumn: valence
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column tempo
+		dataType: double
+		lineageTag: 0440ded8-3204-4e1b-a7d3-0f7c9818e71b
+		summarizeBy: none
+		sourceColumn: tempo
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'popularity (bins)' =
+			IF(
+				ISBLANK('Fact_Track'[popularity]),
+				BLANK(),
+				INT('Fact_Track'[popularity] / 5) * 5
+			)
+		formatString: 0
+		lineageTag: 1db89f70-c005-4866-8e2f-fb552739cf3d
+		summarizeBy: none
+
+		extendedProperty GroupingMetadata =
+				{
+				  "version": 0,
+				  "groupedColumns": [
+				    {
+				      "Column": {
+				        "Expression": {
+				          "SourceRef": {
+				            "Entity": "Fact_Track"
+				          }
+				        },
+				        "Property": "popularity"
+				      }
+				    }
+				  ],
+				  "binningMetadata": {
+				    "binSize": {
+				      "value": 5.0,
+				      "unit": 0
+				    }
+				  }
+				}
+
+		annotation GroupingDesignState = {"Version":0,"Sources":[{"Name":"f","Entity":"Fact_Track"}],"GroupedColumns":[{"Column":{"Expression":{"SourceRef":{"Source":"f"}},"Property":"popularity"}}],"BinItem":{"Expression":{"Floor":{"Expression":{"Column":{"Expression":{"SourceRef":{"Source":"f"}},"Property":"popularity"}},"Size":5.0}}}}
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Track = m
+		mode: import
+		source =
+				let
+				    Source = Spotify_Raw,
+				    #"Columnas seleccionadas" = Table.SelectColumns(Source,
+				        {"track_id","popularity","danceability","energy","loudness","speechiness",
+				         "acousticness","instrumentalness","liveness","valence","tempo"}),
+				    #"Track único" = Table.Distinct(#"Columnas seleccionadas", {"track_id"})
+				in
+				    #"Track único"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

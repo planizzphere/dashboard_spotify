@@ -1,0 +1,38 @@
+table DimGenre
+	lineageTag: 58ea3a66-5f7e-478e-950d-e7a167e11bda
+
+	column genre_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3b739a45-14bc-441c-a110-c20b379b4856
+		summarizeBy: none
+		sourceColumn: genre_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column genre_name
+		dataType: string
+		lineageTag: c47e0a37-1b44-4ab6-8e80-befcb98bf29b
+		summarizeBy: none
+		sourceColumn: genre_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimGenre = m
+		mode: import
+		source =
+				let
+				    Source = Spotify_Raw,
+				    #"Géneros únicos" = Table.Distinct(Table.SelectColumns(Source, {"track_genre"})),
+				    #"Renombrado" = Table.RenameColumns(#"Géneros únicos", {{"track_genre", "genre_name"}}),
+				    #"Índice agregado" = Table.AddIndexColumn(#"Renombrado", "genre_id", 1, 1, Int64.Type),
+				    #"Columnas reordenadas" = Table.ReorderColumns(#"Índice agregado", {"genre_id", "genre_name"}),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Columnas reordenadas",{{"genre_name", Text.Proper, type text}})
+				in
+				    #"Capitalized Each Word"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

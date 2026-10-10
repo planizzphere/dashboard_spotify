@@ -1,0 +1,23 @@
+expression Spotify_Raw =
+		let
+		    Source = Csv.Document(File.Contents("A:\Principal\Escritorio\Keyboard Glazz\EXTRAS\Dashboards\dashboard_spotify\source\spotify-tracks-dataset-detailed.csv"),[Delimiter=",", Columns=20, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+		    #"Encabezados promovidos" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{
+		        {"track_id", type text}, {"artists", type text}, {"album_name", type text},
+		        {"track_name", type text}, {"popularity", Int64.Type}, {"duration_ms", Int64.Type},
+		        {"explicit", type logical}, {"danceability", type number}, {"energy", type number},
+		        {"key", Int64.Type}, {"loudness", type number}, {"mode", Int64.Type},
+		        {"speechiness", type number}, {"acousticness", type number}, {"instrumentalness", type number},
+		        {"liveness", type number}, {"valence", type number}, {"tempo", type number},
+		        {"time_signature", Int64.Type}, {"track_genre", type text}
+		    }),
+		    #"Filas nulas quitadas" = Table.SelectRows(#"Tipo cambiado", each [track_id] <> null and [artists] <> null),
+		    #"Duplicados exactos quitados" = Table.Distinct(#"Filas nulas quitadas")
+		in
+		    #"Duplicados exactos quitados"
+	lineageTag: 4d114c59-2b96-4ddb-8c40-9c9106eb59b4
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
